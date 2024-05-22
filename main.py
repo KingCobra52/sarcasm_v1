@@ -1,5 +1,6 @@
 import json
 
+import numpy as np
 from transformers import pipeline
 from tqdm import tqdm
 
@@ -32,8 +33,8 @@ def main():
         input_strs.append(d['headline'])
         targets.append(d['is_sarcastic'])
     results = get_model_classifications(input_strs)
-    print(f'Model guesses: {results}')
-    print(f'True answers: {targets}')
+    predictions = np.array(results) == 'sarcastic'
+    print(f'Accuracy: {(predictions == targets).mean() * 100:.3f}%')
 
 if __name__ == '__main__':
     main()
