@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import pickle
 
+import matplotlib.pyplot as plt
 import numpy as np
 from transformers import pipeline
 from tqdm import tqdm
@@ -45,10 +46,20 @@ def main():
         input_strs.append(d['headline'])
         targets.append(d['is_sarcastic'])
     num_samples = len(input_strs)
-    results = get_model_classifications(input_strs[: num_samples])
-    breakpoint()
-    predictions = np.array(results) == 'sarcastic'
-    print(f'Accuracy: {(predictions == targets[: num_samples]).mean() * 100:.3f}%')
+    possible_labels = [
+        ['not sarcastic', 'sarcastic'],
+        ['genuine', 'not serious'],
+        ['real', 'fake']
+    ]
+    accuracies = []
+    for real_label_name, fake_label_name in possible_labels:
+        results = get_model_classifications(input_strs[: num_samples])
+        predictions = np.array(results) == fake_label_name
+        acc = (predictions == targets[: num_samples]).mean() * 100
+        print(f'Accuracy: {acc:.3f}%')
+        accuracies.append(acc)
+    plt.bar(range(len(accuracies)), accuracies)
+    plt.show()
 
 if __name__ == '__main__':
     main()
